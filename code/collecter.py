@@ -1,31 +1,25 @@
 import os
 import pickle
 from loading import load
-from smear import smear
+from linker import linker
 from loading import load_model
 import spacy
 from spacy import displacy
 from pathlib import Path
 
-# path_dati="/home/lorenzoserina/MaterialeLuca/liberty/dati/nazioni_capitali_dict_single.pkl"
-# path_modello="roberta-base"#"dccuchile/bert-base-spanish-wwm-cased", bert-base-uncased
-# prova_path="/home/lorenzoserina/MaterialeLuca/liberty/dati/roberta_nazioni_capitali_dict_single"
 
-path_directory="/home/lorenzoserina/MaterialeLuca/liberty/BERT/dati/datasets/contesto/synonyms.pkl"
-path_modello="/home/lorenzoserina/MaterialeLuca/liberty/BERT/modelli/bluebert-base-uncased"# bert-base-uncased, bert-base-multilingual-cased, /home/lorenzoserina/MaterialeLuca/liberty/BERT/modelli/bluebert-base-uncased, "google/bert_uncased_L-8_H-512_A-8"
-prova_path_base="/home/lorenzoserina/MaterialeLuca/liberty/BERT/dati/risultati_trial/contesto/blue/synonyms/"
 
-#for path_dati in os.listdir(path_directory):
-prova_path=prova_path_base#+path_dati
+path_directory="" #dataset pickle
+path_modello=""# bert-base-uncased, bert-base-multilingual-cased, bluebert-base-uncased, "google/bert_uncased_L-8_H-512_A-8"
+prova_path_base="" #path results
+
+prova_path=prova_path_base
 os.mkdir(prova_path)
-path_dati=path_directory#+"/"+path_dati
+path_dati=path_directory
 f = open(path_dati, 'rb')
-#nlp = spacy.load('en_core_web_lg')
 datasets = pickle.load(f)
 dataset=datasets["text"]
-print("Dataset caricato")
 
-print(len(datasets))
 tokenizer, model = load_model(path_modello)
 heads=model.config.num_attention_heads
 layers=model.config.num_hidden_layers
@@ -34,13 +28,7 @@ max_tokens=model.config.max_position_embeddings
 for i in range(len(dataset)):
     print(f"Documento {i}/{len(dataset)}")
     document = dataset[i]
-    #print(document)
     
-    #doc = nlp(document)
-    #svg = displacy.render(doc, style="dep")
-    #print(f"Svg:{svg}")
-    #output_path = Path("sentence.svg")
-    #output_path.open("w", encoding="utf-8").write(svg)
     if len(document) == 0:
         continue
     if document[-1] != '.':
@@ -63,7 +51,6 @@ for i in range(len(dataset)):
         x['tokens'] = tokens
         x['low'] = low
         x['high'] = high
-        # x = {'text': s.text, 'tokens': tokens}
         sentence_dict[id] = x
         id += 1
     os.mkdir(prova_path+'/train-'+str(i))
@@ -72,10 +59,8 @@ for i in range(len(dataset)):
     f.close()
     load(document, 'train-' + str(i), 'train-' + str(i), tokenizer, model, prova_path)
     smear_heads = dict()
-    #heads=[[2,6],[3,0],[11,8],[1,11],[10,10]]#bert-uncased[[2,6],[3,0],[11,8],[1,11],[10,10]] beto [2,8],[10,1],[2,11],[11,4],[7,0] beto_online [[2,7],[3,2],[11,5],[11,1],[4,10]]
     for h in range(heads):
         for l in range(layers):
-    #for h in heads:
             layer=l#[0]
             head=h#h[1]
             print(f"{layer}, {head}")
@@ -94,4 +79,3 @@ for i in range(len(dataset)):
     pickle.dump(smear_heads, f)
     f.close()
 
-#[(2, 6, 0.5278422980197197, 0.7889637686084245), (3, 0, 0.575731358834471, 0.7601693575249139), (11, 8, 0.5793305489361382, 0.8314534542996405), (1, 11, 0.6183630101777527, 0.8241823870782435), (10, 10, 0.6421073110425511, 0.6575927758820771)]
