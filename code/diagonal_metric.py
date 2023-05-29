@@ -32,7 +32,7 @@ def heatmap(data, row_labels, ax=None, path=None):
     plt.savefig(path)
     
 print("Inizio")
-f = open('/home/lorenzoserina/MaterialeLuca/liberty/BERT/dati/datasets/medicine.pkl', 'rb')
+f = open('path', 'rb') #path of dataset in pikle format
 dataset = pickle.load(f)
 dataset=dataset["text"]
 tokenizer, model=load_model("bert-base-multilingual-cased")#bert-base-uncased, google/bert_uncased_L-8_H-512_A-8 , bert-base-multilingual-cased  /home/lorenzoserina/MaterialeLuca/liberty/BERT/modelli/bluebert-base-uncased/
@@ -61,14 +61,10 @@ for i in range(len(dataset)):
     if len(tokens) > max_tokens:
         continue
     attention_tensor = comp_matrix(tokenizer, model, text)[0]
-    #print(comp_matrix(tokenizer, model, text))
     for j in range(layers):
         layer_tensor = attention_tensor[j][0]
         for k in range(heads):
-            #print("Analizzo head", k, "layer", j)
             head_tensor = layer_tensor[k].detach().numpy()
-    # L'attention data si trova sulle righe
-    # sum = np.sum(head_tensor, axis=1)
             me_metrics = list()
             noop_metrics = list()
             back_metrics = list()
@@ -95,10 +91,7 @@ for i in range(len(dataset)):
                 avg_back=1
             else:
                 avg_back = np.average(back_metrics)
-            tuples.append((j, k, avg, avg_noop, avg_back))
-    # heatmap(np.array([float(f'{t[2]:.2f}') for t in tuples]).reshape(12, 12), [str(i) for i in range(12)], path=f"/home/lorenzoserina/MaterialeLuca/liberty/BERT/diagonal_metric/heatmap_diag_{i}.png")
-    # heatmap(np.array([float(f'{t[4]:.2f}') for t in tuples]).reshape(12, 12), [str(i) for i in range(12)], path=f"/home/lorenzoserina/MaterialeLuca/liberty/BERT/diagonal_metric/heatmap_back_{i}.png")
-            
+            tuples.append((j, k, avg, avg_noop, avg_back))     
             
     
     tuple_tot.append(tuples)
@@ -111,10 +104,6 @@ for i in range(len(dataset)):
     for b in tuples[:10]:
 
         oc_back[(b[0],b[1])]+=1
-
-# vettore=[]
-# for i in np.mean(tuple_tot, axis=0):
-#     vettore.append(tuple(i))
   
 #Create an array of the mean of each value of diag_dict
 for i in range(layers):
@@ -125,21 +114,18 @@ for i in range(layers):
         
 diag_dict = {str(k): v for k, v in diag_dict.items()}
 jsd_dict = {str(k): v for k, v in jsd_dict.items()}
-#Create an heatmap of the mean of each value of diag_dict
-#heatmap(np.array([float(f'{t:.2f}') for t in diag_dict.values()]).reshape(12, 12), [str(i) for i in range(12)], path=f"/home/lorenzoserina/MaterialeLuca/liberty/BERT/diagonal_metric/heatmap_unc.png")
 
         
 #Sort the dictionary by value descending
 diag_dict = {k: v for k, v in sorted(diag_dict.items(), key=lambda item: item[1])}
 jsd_dict = {k: v for k, v in sorted(jsd_dict.items(), key=lambda item: item[1])}
 #Save the dictionary in a json file
-with open('/home/lorenzoserina/MaterialeLuca/liberty/BERT/diagonal_metric/diag_medicine_multi.json', 'w') as fp:
+with open('', 'w') as fp:
     json.dump(diag_dict, fp)
-#with open('/home/lorenzoserina/MaterialeLuca/liberty/BERT/diagonal_metric/jsd_17.json', 'w') as fp:
-    #json.dump(jsd_dict, fp)
+
     
     
-print("Diagonal metric")
+print("Self metric")
 for i in range(layers):
     for j in range(heads):
         if occorrenze[(i,j)]!=0:
