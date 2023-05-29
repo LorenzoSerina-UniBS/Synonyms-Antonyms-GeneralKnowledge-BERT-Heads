@@ -69,14 +69,6 @@ def linker(head, layer, name, token, out_dir, tokenizer, model, verbose=True, id
             if token in q:
                 y.append(i)
         x.append(j)
-        # plt.bar(x,y,width=1)
-        # plt.step(x,y)
-        # plt.show()
 
     return means, clust
-    # model = AgglomerativeClustering(distance_threshold=0, n_clusters=None)
 
-    # model = model.fit(att)
-    # plot_dendrogram(model, truncate_mode="level", p=3)
-
-    # plt.show()
