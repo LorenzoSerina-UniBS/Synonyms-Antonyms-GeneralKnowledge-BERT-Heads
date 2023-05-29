@@ -6,7 +6,6 @@ from loading import load_matrix, save_in_json, load_from_json
 from scipy.spatial.distance import jensenshannon
 
 
-#Tieni
 def select_sub_matrix_for_token(out_dir, id_sent, layer, head, token, bert_tokens):
     mtx = load_matrix(out_dir, id_sent, layer, head)
     sel = True
@@ -38,7 +37,6 @@ def select_sub_matrix_for_token(out_dir, id_sent, layer, head, token, bert_token
 
     return frams, j, ha
 
-#Tieni
 def sel_index_by_token(token, bert_tokens, j=0):
     for i in range(len(bert_tokens)):
         if bert_tokens[i] == token:
