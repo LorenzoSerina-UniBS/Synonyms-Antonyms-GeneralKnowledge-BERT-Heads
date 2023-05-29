@@ -4,23 +4,17 @@ from loading import get_sentence, get_bert_tokens
 from comp_att import select_sub_matrix_for_token
 import os
 
-#Tieni
-def smear(head, layer, name, token, out_dir, tokenizer, model, verbose=True, id_token=0):
+def linker(head, layer, name, token, out_dir, tokenizer, model, verbose=True, id_token=0):
     sentence = get_sentence(out_dir, name)
     mtx_dir = os.path.join(out_dir, name)
     bert_tokens = get_bert_tokens(mtx_dir, tokenizer, model, sentence)
 
-    # print(out_dir,name,layer,head,token,bert_tokens)
-
     frams, j, has = select_sub_matrix_for_token(out_dir, name, layer, head, token, bert_tokens)
 
-    # print(frams)
     att = np.array(frams[id_token]).reshape(-1, 1)
-    # print(att)
-    # print(att)
+
 
     clustering = MeanShift().fit(np.array(att))
-    # print(clustering.labels_)
 
     if verbose:
         print(clustering.labels_)
@@ -40,9 +34,7 @@ def smear(head, layer, name, token, out_dir, tokenizer, model, verbose=True, id_
             clust[clustering.labels_[i]].append((token, frams[id_token][i]))
 
     means = dict()
-    # print(clust)
     for k in clust.keys():
-        # print(k)
         if len(clust[k]) != 0:
             atts = list()
             for att in clust[k]:
@@ -77,10 +69,6 @@ def smear(head, layer, name, token, out_dir, tokenizer, model, verbose=True, id_
             if token in q:
                 y.append(i)
         x.append(j)
-
-        # plot things
-        # if verbose == True:
-        # print(x,y)
         # plt.bar(x,y,width=1)
         # plt.step(x,y)
         # plt.show()
